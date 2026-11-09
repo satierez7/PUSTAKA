@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Catat Peminjaman{% endblock %}
+{% block content %}
+<h1>Catat Peminjaman</h1>
+<p class="sub">Untuk anggota yang datang langsung ke meja layanan</p>
+<div class="card" style="max-width:640px">
+  <form method="post">
+    <label>Anggota</label>
+    <select name="member_id" required>
+      <option value="">-- pilih anggota --</option>
+      {% for m in members %}<option value="{{ m.id }}">{{ m.member_code }} · {{ m.name }}</option>{% endfor %}
+    </select>
+    <label>Buku (hanya yang stoknya ada)</label>
+    <select name="book_id" required>
+      <option value="">-- pilih buku --</option>
+      {% for b in books %}<option value="{{ b.id }}">{{ b.title }} · {{ b.author }} (stok {{ b.stock_available }})</option>{% endfor %}
+    </select>
+    <p class="muted small">Lama pinjam {{ loan_days }} hari sejak hari ini. Maksimal {{ max_loans }} buku per anggota.
+      Denda {{ fine_per_day|rupiah }} per hari keterlambatan.</p>
+    <p>
+      <button class="btn">Simpan Peminjaman</button>
+      <a class="btn ghost" href="{{ url_for('loans') }}">Batal</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

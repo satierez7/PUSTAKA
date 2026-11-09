@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}Pengembalian{% endblock %}
+{% block content %}
+<h1>Pengembalian</h1>
+<p class="sub">Proses buku yang dikembalikan anggota</p>
+<div class="two-col wide-left">
+  <div>
+    <form class="filters" method="get" style="margin-bottom:12px">
+      <div><input name="q" value="{{ q }}" placeholder="Cari kode pinjam, nama anggota, atau judul buku..."></div>
+      <div class="auto"><button class="btn">Cari</button></div>
+    </form>
+
+    {% if selected %}
+    <div class="card">
+      <div class="pick-row">
+        <h2>{{ selected.title }}</h2>
+        {{ chip(selected.label, selected.tone) }}
+      </div>
+      <dl class="detail">
+        <dt>Kode pinjam</dt><dd>{{ selected.code }}</dd>
+        <dt>Anggota</dt><dd>{{ selected.member_name }} <span class="muted small">({{ selected.member_code }})</span></dd>
+        <dt>Tanggal pinjam</dt><dd>{{ selected.loan_date|tgl }}</dd>
+        <dt>Jatuh tempo</dt><dd>{{ selected.due_date|tgl }}</dd>
+        <dt>Tanggal kembali</dt><dd>{{ today|tgl }}</dd>
+        <dt>Keterlambatan</dt><dd>{{ selected.late_days }} hari</dd>
+      </dl>
+      <div class="fine-box">
+        <div>
+          <div class="muted small">Denda</div>
+          {% if selected.late_days %}<div class="muted small">{{ selected.late_days }} hari × {{ fine_per_day|rupiah }}</div>{% endif %}
+        </div>
+        <div class="amount">{{ selected.est_fine|rupiah }}</div>
+      </div>
+      <form method="post" action="{{ url_for('return_process', lid=selected.id) }}" style="margin-top:14px">
+        <button class="btn">Proses pengembalian</button>
+        <a class="btn ghost" href="{{ url_for('returns') }}">Batal</a>
+      </form>
+    </div>
+    {% elif matches %}
+    <div class="card">
+      <div class="card-head"><h2>{{ matches|length }} hasil untuk "{{ q }}"</h2></div>
+      {% for l in matches %}
+      <a class="pick" href="{{ url_for('returns', id=l.id) }}">
+        <div class="pick-row"><strong>{{ l.title }}</strong>{{ chip(l.label, l.tone) }}</div>
+        <div class="meta">{{ l.code }} · {{ l.member_name }}</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+      <p class="muted" style="margin:0">{% if q %}Tidak ada peminjaman aktif yang cocok dengan "{{ q }}".
+        {% else %}Cari peminjaman di atas, atau pilih dari daftar "Belum dikembalikan".{% endif %}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <section class="card">
+    <div class="card-head"><h2>Belum dikembalikan</h2></div>
+    {% for l in waiting %}
+    <a class="pick" href="{{ url_for('returns', id=l.id) }}">
+      <div class="pick-row"><strong>{{ l.title }}</strong></div>
+      <div class="meta">{{ l.member_name }}</div>
+      <div style="margin-top:3px">{{ chip(l.label, l.tone) }}</div>
+    </a>
+    {% else %}<p class="muted">Semua buku sudah kembali.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

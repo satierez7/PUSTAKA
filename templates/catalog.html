@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% from "macros.html" import book_card, chip %}
+{% block title %}Katalog Buku{% endblock %}
+{% block content %}
+<div class="two-col">
+  <div>
+    <h1>{{ 'Katalog Buku' if mode == 'home' else heading }}</h1>
+    <p class="sub">{{ 'Temukan buku berikutnya yang ingin kamu baca' if mode == 'home' else 'Klik buku untuk melihat detail dan mengajukan pinjam' }}</p>
+
+    <form class="filters" method="get" action="{{ url_for('catalog') }}">
+      <div><input name="q" value="{{ q }}" placeholder="Cari judul, penulis, penerbit..."></div>
+      <div style="max-width:200px">
+        <select name="kategori" onchange="this.form.submit()">
+          <option value="">Semua kategori</option>
+          {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if cat == c.id }}>{{ c.name }}</option>{% endfor %}
+        </select></div>
+      <div class="auto"><button class="btn">Cari</button></div>
+    </form>
+
+    {% if mode == 'home' %}
+      <h2 class="section-title">Baru Ditambahkan</h2>
+      <div class="book-grid">{% for b in new_books %}{{ book_card(b) }}{% endfor %}</div>
+      <h2 class="section-title">Rekomendasi Untukmu</h2>
+      <div class="book-grid">{% for b in recs %}{{ book_card(b) }}{% else %}<p class="muted">Belum ada rekomendasi.</p>{% endfor %}</div>
+    {% else %}
+      <div class="book-grid">{% for b in results %}{{ book_card(b) }}{% else %}<p class="muted">Tidak ada buku yang cocok.</p>{% endfor %}</div>
+    {% endif %}
+  </div>
+
+  <aside class="card">
+    <div class="card-head"><h2>Pinjaman Aktif</h2><a href="{{ url_for('my_loans') }}">Lihat semua</a></div>
+    {% for l in my_active %}
+    <div class="side-loan">
+      <strong>{{ l.title }}</strong>
+      <div class="meta">{% if l.status == 'dipinjam' %}Jatuh tempo {{ l.due_date|tgl }}{% else %}Diajukan {{ l.requested_at|tgl }}{% endif %}</div>
+      <div style="margin-top:3px">{{ chip(l.label, l.tone) }}</div>
+    </div>
+    {% else %}<p class="muted">Belum ada pinjaman aktif.</p>{% endfor %}
+    <p class="muted small" style="margin:12px 0 0">Kuota pinjam: {{ my_active|length }} dari {{ max_loans }} buku</p>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}Kategori{% endblock %}
+{% block content %}
+<h1>Kategori</h1>
+<p class="sub">Pilih kategori untuk melihat bukunya</p>
+<div class="stats" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+  {% for c in categories %}
+  <a class="card stat" href="{{ url_for('catalog', kategori=c.id) }}" style="text-decoration:none;color:inherit">
+    <div class="l">{{ c.n }} judul</div>
+    <div class="n" style="font-size:20px">{{ c.name }}</div>
+  </a>
+  {% else %}<p class="muted">Belum ada kategori.</p>{% endfor %}
+</div>
+{% endblock %}

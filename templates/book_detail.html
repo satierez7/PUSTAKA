@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% from "macros.html" import cover, chip %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{{ url_for('catalog') if me.role == 'anggota' else url_for('books') }}">← Kembali</a></p>
+<div class="book-detail">
+  <div>{{ cover(book, true) }}</div>
+  <div>
+    <h1>{{ book.title }}</h1>
+    <p class="sub" style="margin-bottom:6px">{{ book.author }}</p>
+    <div>
+      {% if book.rating %}<span class="stars">{{ book.rating|stars }}</span> <strong>{{ book.rating }}</strong>
+        <span class="muted small">({{ book.rating_count }} penilaian)</span>
+      {% else %}<span class="muted small">Belum ada rating</span>{% endif %}
+    </div>
+    <dl class="info-list">
+      <dt>Kategori</dt><dd>{{ book.category or '-' }}</dd>
+      <dt>Penerbit</dt><dd>{{ book.publisher or '-' }}{% if book.year %}, {{ book.year }}{% endif %}</dd>
+      <dt>ISBN</dt><dd>{{ book.isbn or '-' }}</dd>
+      <dt>Lokasi rak</dt><dd>{{ book.shelf or '-' }}</dd>
+      <dt>Ketersediaan</dt>
+      <dd>{% if book.stock_available %}{{ chip('Tersedia ' ~ book.stock_available ~ ' dari ' ~ book.stock_total, 'green') }}
+          {% else %}{{ chip('Stok habis', 'red') }}{% endif %}</dd>
+    </dl>
+    {% if book.description %}<p style="max-width:560px;line-height:1.6">{{ book.description }}</p>{% endif %}
+
+    {% if me.role == 'anggota' %}
+      <div class="card" style="max-width:560px;margin-top:16px">
+        {% if active_loan %}
+          <p style="margin:0">Buku ini ada di pinjamanmu: {{ chip(active_loan.label, active_loan.tone) }}</p>
+        {% else %}
+          <form method="post" action="{{ url_for('loan_request', bid=book.id) }}">
+            <button class="btn" {{ 'disabled' if reason }}>Ajukan Pinjam</button>
+            {% if reason %}<span class="muted small" style="margin-left:8px">{{ reason }}</span>
+            {% else %}<span class="muted small" style="margin-left:8px">Petugas akan menyetujui, lalu ambil bukunya di perpustakaan.</span>{% endif %}
+          </form>
+        {% endif %}
+        <form method="post" action="{{ url_for('favorite_toggle', bid=book.id) }}" style="margin-top:10px">
+          <button class="btn ghost sm">{{ '♥ Hapus dari favorit' if is_fav else '♡ Tambah ke favorit' }}</button>
+        </form>
+      </div>
+
+      {% if can_rate %}
+      <div class="card" style="max-width:560px;margin-top:12px">
+        <strong>{{ 'Ubah ratingmu' if my_stars else 'Beri rating' }}</strong>
+        <form method="post" action="{{ url_for('rate_book', bid=book.id) }}" class="star-pick" style="margin-top:8px">
+          {% for n in range(1, 6) %}<label><input type="radio" name="stars" value="{{ n }}" {{ 'checked' if my_stars == n }}> {{ n }} ★</label>{% endfor %}
+          <button class="btn sm">Simpan</button>
+        </form>
+      </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

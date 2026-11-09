@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% from "macros.html" import book_card %}
+{% block title %}Favorit{% endblock %}
+{% block content %}
+<h1>Favorit</h1>
+<p class="sub">Buku yang kamu simpan untuk dibaca nanti</p>
+<div class="book-grid">
+  {% for b in rows %}{{ book_card(b) }}{% else %}
+  <div class="card" style="grid-column:1/-1"><p class="muted" style="margin:0">Belum ada favorit. Buka detail buku lalu pilih "Tambah ke favorit".</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

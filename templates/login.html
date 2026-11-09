@@ -1,0 +1,20 @@
+{% extends "auth.html" %}
+{% block title %}Masuk{% endblock %}
+{% block toplink %}<a href="{{ url_for('register') }}">Daftar</a>{% endblock %}
+{% block form %}
+<h1>Masuk Sekarang</h1>
+<p class="sub">Pinjam buku kesukaanmu dengan mudah</p>
+<form method="post">
+  <label>Email</label>
+  <input type="email" name="email" placeholder="nama@email.com" required autofocus>
+  <label>Kata sandi</label>
+  <input type="password" name="password" placeholder="Kata sandi" required>
+  <button class="btn">Masuk</button>
+</form>
+<div class="demo">
+  <strong>Akun contoh</strong><br>
+  Admin: admin@pustaka.id / admin123<br>
+  Petugas: petugas@pustaka.id / petugas123<br>
+  Anggota: andi@pustaka.id / anggota123
+</div>
+{% endblock %}

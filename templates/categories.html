@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Kategori{% endblock %}
+{% block content %}
+<h1>Kategori Buku</h1>
+<p class="sub">Kelompokkan buku agar mudah dicari</p>
+<div class="card" style="max-width:640px">
+  <form method="post" action="{{ url_for('category_add') }}" class="filters">
+    <div><label>Kategori baru</label><input name="name" placeholder="contoh: Novel Remaja" required></div>
+    <div class="auto"><button class="btn">+ Tambah</button></div>
+  </form>
+  <table>
+    <tr><th>Nama kategori</th><th>Jumlah judul</th><th></th></tr>
+    {% for c in categories %}
+    <tr>
+      <td>
+        <form class="inline" method="post" action="{{ url_for('category_edit', cid=c.id) }}" style="display:flex;gap:6px">
+          <input name="name" value="{{ c.name }}" style="max-width:240px">
+          <button class="btn ghost sm">Simpan</button>
+        </form>
+      </td>
+      <td>{{ c.n }}</td>
+      <td class="right">
+        <form class="inline" method="post" action="{{ url_for('category_delete', cid=c.id) }}"
+              onsubmit="return confirm('Hapus kategori ini?')"><button class="btn red sm">Hapus</button></form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="3" class="muted">Belum ada kategori.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

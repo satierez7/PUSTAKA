@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<p class="sub">Ringkasan perpustakaan hari ini</p>
+
+{% if stats.pending %}
+<div class="alert yellow">{{ stats.pending }} pengajuan peminjaman menunggu persetujuan.
+  <a href="{{ url_for('loans', status='menunggu') }}"><strong>Tinjau sekarang →</strong></a></div>
+{% endif %}
+
+<div class="stats">
+  <div class="card stat"><div class="l">Total buku</div><div class="n">{{ stats.books|num }}</div></div>
+  <div class="card stat"><div class="l">Anggota</div><div class="n">{{ stats.members|num }}</div></div>
+  <div class="card stat"><div class="l">Sedang dipinjam</div><div class="n">{{ stats.borrowed|num }}</div></div>
+  <div class="card stat"><div class="l">Terlambat</div><div class="n">{{ stats.late|num }}</div></div>
+</div>
+
+<div class="two-col mt">
+  <section class="card">
+    <div class="card-head"><h2>Peminjaman terbaru</h2><a href="{{ url_for('loans') }}">Lihat semua</a></div>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Anggota</th><th>Buku</th><th>Jatuh tempo</th><th>Status</th></tr>
+      {% for l in recent %}
+      <tr>
+        <td>{{ l.member_name }}</td>
+        <td>{{ l.title }}</td>
+        <td class="nowrap">{{ l.due_date|tgl }}</td>
+        <td>{{ chip(l.state, l.state_tone) }}</td>
+      </tr>
+      {% else %}<tr><td colspan="4" class="muted">Belum ada transaksi.</td></tr>{% endfor %}
+    </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Perlu pengembalian</h2><a href="{{ url_for('returns') }}">Lihat semua</a></div>
+    {% for l in need_return %}
+    <div class="side-loan">
+      <div class="pick-row">
+        <div>
+          <strong>{{ l.member_name }}</strong>
+          <div class="meta">{{ l.title }}</div>
+        </div>
+        <a class="btn sm" href="{{ url_for('returns', id=l.id) }}">Proses</a>
+      </div>
+      <div style="margin-top:4px">{{ chip(l.label, l.tone) }}</div>
+    </div>
+    {% else %}<p class="muted">Tidak ada buku yang sedang dipinjam.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

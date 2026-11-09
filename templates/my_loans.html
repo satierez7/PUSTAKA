@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}Pinjaman Saya{% endblock %}
+{% block content %}
+<h1>Pinjaman Saya</h1>
+<p class="sub">Pantau buku yang sedang dan pernah kamu pinjam</p>
+<div class="tabs">
+  <a href="{{ url_for('my_loans') }}" class="{{ 'active' if tab == 'aktif' }}">Aktif</a>
+  <a href="{{ url_for('my_loans', tab='riwayat') }}" class="{{ 'active' if tab == 'riwayat' }}">Riwayat</a>
+</div>
+
+{% for l in rows %}
+<div class="loan-card">
+  <div>
+    <div class="t"><a href="{{ url_for('book_detail', bid=l.book_id) }}" style="color:inherit;text-decoration:none">{{ l.title }}</a></div>
+    <div class="meta">
+      {% if l.status == 'menunggu' %}Diajukan {{ l.requested_at|tgl }}
+      {% elif l.status == 'dipinjam' %}Dipinjam {{ l.loan_date|tgl }} · Jatuh tempo {{ l.due_date|tgl }}
+      {% elif l.status == 'dikembalikan' %}Dipinjam {{ l.loan_date|tgl }} · Dikembalikan {{ l.return_date|tgl }}
+      {% else %}Diajukan {{ l.requested_at|tgl }}{% endif %}
+    </div>
+  </div>
+  <div class="side">
+    {{ chip(l.label, l.tone) }}
+    {% if l.late_days %}<span class="fine">Denda {{ l.est_fine|rupiah }}</span>{% endif %}
+    {% if l.status == 'dikembalikan' and l.fine %}<span class="fine">Denda {{ l.fine|rupiah }}</span>{% endif %}
+    {% if l.status == 'menunggu' %}
+      <form class="inline" method="post" action="{{ url_for('loan_cancel', lid=l.id) }}"
+            onsubmit="return confirm('Batalkan pengajuan ini?')"><button class="btn ghost sm">Batalkan</button></form>
+    {% elif l.status == 'dikembalikan' %}
+      <a class="small" href="{{ url_for('book_detail', bid=l.book_id) }}">Beri rating</a>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="card"><p class="muted" style="margin:0">
+  {% if tab == 'aktif' %}Belum ada pinjaman aktif. <a href="{{ url_for('catalog') }}">Cari buku</a> untuk mulai meminjam.
+  {% else %}Belum ada riwayat peminjaman.{% endif %}</p></div>
+{% endfor %}
+
+<p class="muted small" style="margin-top:14px">Maksimal {{ max_loans }} buku sekaligus · Lama pinjam {{ loan_days }} hari ·
+  Denda {{ fine_per_day|rupiah }} per hari{% if total_fine %} · Total denda tercatat {{ total_fine|rupiah }}{% endif %}</p>
+{% endblock %}

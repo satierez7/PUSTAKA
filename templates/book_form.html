@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}{{ 'Ubah' if book else 'Tambah' }} Buku{% endblock %}
+{% block content %}
+<h1>{{ 'Ubah Buku' if book else 'Tambah Buku' }}</h1>
+<p class="sub">Isi data buku dengan lengkap</p>
+<div class="card" style="max-width:760px">
+  <form method="post">
+    <label>Judul *</label>
+    <input name="title" required value="{{ v.get('title', '') }}">
+    <div class="row">
+      <div><label>Penulis *</label><input name="author" required value="{{ v.get('author', '') }}"></div>
+      <div><label>Penerbit</label><input name="publisher" value="{{ v.get('publisher') or '' }}"></div>
+    </div>
+    <div class="row">
+      <div><label>ISBN</label><input name="isbn" value="{{ v.get('isbn') or '' }}"></div>
+      <div><label>Tahun terbit</label><input name="year" type="number" value="{{ v.get('year') or '' }}"></div>
+    </div>
+    <div class="row">
+      <div><label>Kategori</label>
+        <select name="category_id">
+          <option value="">-</option>
+          {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if v.get('category_id')|string == c.id|string }}>{{ c.name }}</option>{% endfor %}
+        </select></div>
+      <div><label>Lokasi rak</label><input name="shelf" value="{{ v.get('shelf') or '' }}" placeholder="contoh: A-01"></div>
+      <div><label>Jumlah stok</label><input name="stock_total" type="number" min="0" value="{{ v.get('stock_total', 1) }}"></div>
+    </div>
+    <label>Sinopsis singkat</label>
+    <textarea name="description" rows="3">{{ v.get('description') or '' }}</textarea>
+    <p style="margin-top:18px">
+      <button class="btn">Simpan</button>
+      <a class="btn ghost" href="{{ url_for('books') }}">Batal</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

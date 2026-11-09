@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}Laporan{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Laporan Peminjaman</h1><p class="sub">Periode {{ dari|tgl }} sampai {{ sampai|tgl }}</p></div>
+  <div class="no-print">
+    <a class="btn ghost" href="{{ url_for('report_csv', dari=dari, sampai=sampai) }}">Unduh CSV</a>
+    <button class="btn" onclick="window.print()">Cetak</button>
+  </div>
+</div>
+<form class="filters no-print" method="get">
+  <div><label>Dari tanggal</label><input type="date" name="dari" value="{{ dari }}"></div>
+  <div><label>Sampai tanggal</label><input type="date" name="sampai" value="{{ sampai }}"></div>
+  <div class="auto"><button class="btn">Tampilkan</button></div>
+</form>
+
+<div class="stats">
+  <div class="card stat"><div class="l">Total transaksi</div><div class="n">{{ summary.total }}</div></div>
+  <div class="card stat"><div class="l">Masih dipinjam</div><div class="n">{{ summary.borrowed }}</div></div>
+  <div class="card stat"><div class="l">Dikembalikan</div><div class="n">{{ summary.returned }}</div></div>
+  <div class="card stat"><div class="l">Total denda</div><div class="n" style="font-size:22px">{{ summary.fine|rupiah }}</div></div>
+</div>
+
+<div class="two-col mt">
+  <section class="card">
+    <div class="card-head"><h2>Daftar transaksi</h2></div>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Kode</th><th>Anggota</th><th>Buku</th><th>Pinjam</th><th>Kembali</th><th>Status</th><th class="right">Denda</th></tr>
+      {% for l in rows %}
+      <tr>
+        <td class="nowrap">{{ l.code }}</td><td>{{ l.member_name }}</td><td>{{ l.title }}</td>
+        <td class="nowrap">{{ l.loan_date|tgl }}</td><td class="nowrap">{{ l.return_date|tgl }}</td>
+        <td>{{ chip(l.state, l.state_tone) }}</td>
+        <td class="right nowrap">{{ l.shown_fine|rupiah if l.shown_fine else '-' }}</td>
+      </tr>
+      {% else %}<tr><td colspan="7" class="muted">Tidak ada transaksi pada periode ini.</td></tr>{% endfor %}
+    </table>
+    </div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Buku terpopuler</h2></div>
+    {% for title, n in top %}
+    <div class="side-loan pick-row"><span>{{ loop.index }}. {{ title }}</span><strong>{{ n }}×</strong></div>
+    {% else %}<p class="muted">Belum ada data.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

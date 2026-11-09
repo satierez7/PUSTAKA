@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}Peminjaman{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Peminjaman</h1><p class="sub">Setujui pengajuan anggota atau catat peminjaman langsung</p></div>
+  <a class="btn" href="{{ url_for('loan_new') }}">+ Catat Peminjaman</a>
+</div>
+<div class="tabs">
+  <a href="{{ url_for('loans', status='semua') }}" class="{{ 'active' if status == 'semua' }}">Semua</a>
+  <a href="{{ url_for('loans', status='menunggu') }}" class="{{ 'active' if status == 'menunggu' }}">Menunggu ({{ counts.menunggu }})</a>
+  <a href="{{ url_for('loans', status='dipinjam') }}" class="{{ 'active' if status == 'dipinjam' }}">Dipinjam ({{ counts.dipinjam }})</a>
+  <a href="{{ url_for('loans', status='terlambat') }}" class="{{ 'active' if status == 'terlambat' }}">Terlambat ({{ counts.terlambat }})</a>
+  <a href="{{ url_for('loans', status='dikembalikan') }}" class="{{ 'active' if status == 'dikembalikan' }}">Dikembalikan</a>
+  <a href="{{ url_for('loans', status='ditolak') }}" class="{{ 'active' if status == 'ditolak' }}">Ditolak</a>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <input type="hidden" name="status" value="{{ status }}">
+    <div><label>Cari kode (PJ-0001), nama anggota, atau judul buku</label><input name="q" value="{{ q }}"></div>
+    <div class="auto"><button class="btn">Cari</button></div>
+  </form>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Kode</th><th>Anggota</th><th>Buku</th><th>Pinjam</th><th>Jatuh tempo</th><th>Status</th><th></th></tr>
+    {% for l in rows %}
+    <tr>
+      <td class="nowrap">{{ l.code }}</td>
+      <td>{{ l.member_name }}<br><span class="muted small">{{ l.member_code }}</span></td>
+      <td>{{ l.title }}</td>
+      <td class="nowrap">{{ (l.loan_date or l.requested_at)|tgl }}</td>
+      <td class="nowrap">{{ l.due_date|tgl }}</td>
+      <td>{{ chip(l.state, l.state_tone) }}
+        {% if l.late_days %}<div class="fine">Denda {{ l.est_fine|rupiah }}</div>{% endif %}
+        {% if l.status == 'dikembalikan' and l.fine %}<div class="fine">Denda {{ l.fine|rupiah }}</div>{% endif %}</td>
+      <td class="nowrap right">
+        {% if l.status == 'menunggu' %}
+          <form class="inline" method="post" action="{{ url_for('loan_approve', lid=l.id) }}"><button class="btn green sm">Setujui</button></form>
+          <form class="inline" method="post" action="{{ url_for('loan_reject', lid=l.id) }}"
+                onsubmit="return confirm('Tolak pengajuan ini?')"><button class="btn red sm">Tolak</button></form>
+        {% elif l.status == 'dipinjam' %}
+          <a class="btn sm" href="{{ url_for('returns', id=l.id) }}">Kembalikan</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="7" class="muted">Tidak ada data.</td></tr>{% endfor %}
+  </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% set label = 'Anggota' if kind == 'anggota' else 'Petugas' %}
+{% block title %}{{ 'Ubah' if user else 'Tambah' }} {{ label }}{% endblock %}
+{% block content %}
+<h1>{{ 'Ubah' if user else 'Tambah' }} {{ label }}</h1>
+<p class="sub">{% if user and user.member_code %}Kode anggota {{ user.member_code }}{% else %}Isi data akun{% endif %}</p>
+<div class="card" style="max-width:640px">
+  <form method="post">
+    <label>Nama lengkap *</label>
+    <input name="name" required value="{{ v.get('name', '') }}">
+    <label>Email (dipakai untuk masuk) *</label>
+    <input type="email" name="email" required value="{{ v.get('email', '') }}">
+    {% if kind == 'anggota' %}
+    <div class="row">
+      <div><label>No. HP</label><input name="phone" value="{{ v.get('phone') or '' }}"></div>
+      <div><label>Alamat</label><input name="address" value="{{ v.get('address') or '' }}"></div>
+    </div>
+    {% else %}
+    <label>Peran</label>
+    <select name="role">
+      <option value="petugas" {{ 'selected' if v.get('role') != 'admin' }}>Petugas</option>
+      <option value="admin" {{ 'selected' if v.get('role') == 'admin' }}>Admin</option>
+    </select>
+    {% endif %}
+    <label>{{ 'Kata sandi baru (kosongkan kalau tidak diganti)' if user else 'Kata sandi * (minimal 6 karakter)' }}</label>
+    <input type="password" name="password" autocomplete="new-password" {{ '' if user else 'required' }}>
+    {% if user %}
+    <label>Status akun</label>
+    <select name="status">
+      <option value="aktif" {{ 'selected' if v.get('status') != 'nonaktif' }}>Aktif</option>
+      <option value="nonaktif" {{ 'selected' if v.get('status') == 'nonaktif' }}>Nonaktif (tidak bisa masuk)</option>
+    </select>
+    {% endif %}
+    <p style="margin-top:18px">
+      <button class="btn">Simpan</button>
+      <a class="btn ghost" href="{{ url_for('members') if kind == 'anggota' else url_for('staff_list') }}">Batal</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

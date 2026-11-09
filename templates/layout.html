@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% from "macros.html" import flashes %}
+{% block body %}
+{% set a = active|default('') %}
+<header class="topbar">
+  <a class="brand" href="{{ url_for('index') }}">PUSTAKA</a>
+  <form class="search" action="{{ url_for('catalog') if me.role == 'anggota' else url_for('books') }}" method="get">
+    <input name="q" value="{{ request.args.get('q', '') }}" placeholder="Cari buku, penulis, kategori...">
+  </form>
+  <div class="userchip">
+    <a class="who" href="{{ url_for('profile') }}" title="Profil dan ganti kata sandi">
+      <span>{{ me.name }}</span><span class="avatar">{{ me.name|initials }}</span></a>
+    <a class="logout" href="{{ url_for('logout') }}">Keluar</a>
+  </div>
+</header>
+<div class="shell">
+  <aside class="sidebar">
+    {% if me.role == 'anggota' %}
+      <div class="nav-title">Jelajah</div>
+      <a href="{{ url_for('catalog') }}" class="{{ 'active' if a == 'catalog' }}">Katalog Buku</a>
+      <a href="{{ url_for('catalog_categories') }}" class="{{ 'active' if a == 'cats' }}">Kategori</a>
+      <a href="{{ url_for('catalog', urut='terbaru') }}" class="{{ 'active' if a == 'latest' }}">Terkini</a>
+      <div class="nav-title">Akun Saya</div>
+      <a href="{{ url_for('my_loans') }}" class="{{ 'active' if a == 'mine' }}">Pinjaman Saya</a>
+      <a href="{{ url_for('favorites') }}" class="{{ 'active' if a == 'favs' }}">Favorit</a>
+      <a href="{{ url_for('my_loans', tab='riwayat') }}" class="{{ 'active' if a == 'history' }}">Riwayat</a>
+      <a href="{{ url_for('profile') }}" class="{{ 'active' if a == 'profile' }}">Profil</a>
+    {% else %}
+      <div class="nav-title">Utama</div>
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if a == 'dashboard' }}">Dashboard</a>
+      <div class="nav-title">Data</div>
+      <a href="{{ url_for('books') }}" class="{{ 'active' if a == 'books' }}">Data Buku</a>
+      <a href="{{ url_for('category_list') }}" class="{{ 'active' if a == 'categories' }}">Kategori</a>
+      <a href="{{ url_for('members') }}" class="{{ 'active' if a == 'members' }}">Anggota</a>
+      {% if me.role == 'admin' %}<a href="{{ url_for('staff_list') }}" class="{{ 'active' if a == 'staff' }}">Petugas</a>{% endif %}
+      <div class="nav-title">Transaksi</div>
+      <a href="{{ url_for('loans') }}" class="{{ 'active' if a == 'loans' }}">Peminjaman
+        {% if pending_count %}<span class="badge">{{ pending_count }}</span>{% endif %}</a>
+      <a href="{{ url_for('returns') }}" class="{{ 'active' if a == 'returns' }}">Pengembalian</a>
+      <div class="nav-title">Laporan</div>
+      <a href="{{ url_for('report') }}" class="{{ 'active' if a == 'report' }}">Laporan</a>
+      {% if me.role == 'admin' %}
+        <div class="nav-title">Sistem</div>
+        <a href="{{ url_for('settings_page') }}" class="{{ 'active' if a == 'settings' }}">Pengaturan</a>
+      {% endif %}
+      <a href="{{ url_for('profile') }}" class="{{ 'active' if a == 'profile' }}" style="margin-top:14px">Profil</a>
+    {% endif %}
+  </aside>
+  <main class="main">
+    {{ flashes() }}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

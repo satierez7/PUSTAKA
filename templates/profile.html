@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Profil{% endblock %}
+{% block content %}
+<h1>Profil Saya</h1>
+<p class="sub">{{ me.email }} · {{ me.role }}{% if me.member_code %} · {{ me.member_code }}{% endif %}</p>
+<div class="two-col" style="grid-template-columns:1fr 1fr">
+  <section class="card">
+    <h2>Data diri</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="info">
+      <label>Nama lengkap</label><input name="name" required value="{{ me.name }}">
+      <label>No. HP</label><input name="phone" value="{{ me.phone or '' }}">
+      <label>Alamat</label><input name="address" value="{{ me.address or '' }}">
+      <p style="margin-top:16px"><button class="btn">Simpan</button></p>
+    </form>
+  </section>
+  <section class="card">
+    <h2>Ganti kata sandi</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="password">
+      <label>Kata sandi lama</label><input type="password" name="current_password" required>
+      <label>Kata sandi baru (minimal 6 karakter)</label><input type="password" name="new_password" required autocomplete="new-password">
+      <label>Ulangi kata sandi baru</label><input type="password" name="confirm_password" required autocomplete="new-password">
+      <p style="margin-top:16px"><button class="btn">Ganti Kata Sandi</button></p>
+    </form>
+  </section>
+</div>
+{% endblock %}

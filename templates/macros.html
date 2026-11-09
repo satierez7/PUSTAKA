@@ -1,0 +1,26 @@
+{% macro cover(b, big=false) %}
+<div class="cover{{ ' big' if big }}" style="{{ b.id|cover_style }}">
+  <span class="cover-title">{{ b.title }}</span>
+  <span class="cover-author">{{ b.author }}</span>
+</div>
+{% endmacro %}
+
+{% macro book_card(b) %}
+<a class="bcard" href="{{ url_for('book_detail', bid=b.id) }}">
+  {{ cover(b) }}
+  <div class="bcard-title">{{ b.title }}</div>
+  <div class="bcard-author">{{ b.author }}</div>
+  <div class="bcard-meta">
+    {% if b.rating %}<span><span class="stars">★</span> {{ b.rating }}</span>{% else %}<span>Belum ada rating</span>{% endif %}
+    <span class="stok {{ 'out' if b.stock_available == 0 }}">{{ ('Stok ' ~ b.stock_available) if b.stock_available else 'Habis' }}</span>
+  </div>
+</a>
+{% endmacro %}
+
+{% macro chip(text, tone) %}<span class="chip {{ tone }}">{{ text }}</span>{% endmacro %}
+
+{% macro flashes() %}
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in msgs %}<div class="alert {{ cat }}">{{ msg }}</div>{% endfor %}
+{% endwith %}
+{% endmacro %}

@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}Data Buku{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Data Buku</h1><p class="sub">Kelola katalog dan stok buku</p></div>
+  <a class="btn" href="{{ url_for('book_new') }}">+ Tambah Buku</a>
+</div>
+<div class="card">
+  <form class="filters" method="get">
+    <div><label>Cari judul, penulis, ISBN</label><input name="q" value="{{ q }}" placeholder="Ketik kata kunci..."></div>
+    <div><label>Kategori</label>
+      <select name="kategori">
+        <option value="">Semua kategori</option>
+        {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if cat|string == c.id|string }}>{{ c.name }}</option>{% endfor %}
+      </select></div>
+    <div class="auto"><button class="btn">Cari</button></div>
+  </form>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Judul</th><th>Penulis</th><th>Kategori</th><th>Rak</th><th>Stok</th><th></th></tr>
+    {% for b in rows %}
+    <tr>
+      <td><strong>{{ b.title }}</strong>{% if b.isbn %}<br><span class="muted small">ISBN {{ b.isbn }}</span>{% endif %}</td>
+      <td>{{ b.author }}</td>
+      <td>{{ b.category or '-' }}</td>
+      <td>{{ b.shelf or '-' }}</td>
+      <td>{{ chip(b.stock_available ~ ' / ' ~ b.stock_total, 'green' if b.stock_available else 'red') }}</td>
+      <td class="nowrap right">
+        <a class="btn ghost sm" href="{{ url_for('book_edit', bid=b.id) }}">Ubah</a>
+        <form class="inline" method="post" action="{{ url_for('book_delete', bid=b.id) }}"
+              onsubmit="return confirm('Hapus buku ini?')"><button class="btn red sm">Hapus</button></form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="muted">Tidak ada buku ditemukan.</td></tr>{% endfor %}
+  </table>
+  </div>
+</div>
+{% endblock %}

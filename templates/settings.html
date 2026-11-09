@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Pengaturan{% endblock %}
+{% block content %}
+<h1>Pengaturan</h1>
+<p class="sub">Aturan peminjaman yang berlaku untuk semua anggota</p>
+<div class="card" style="max-width:520px">
+  <form method="post">
+    <label>Lama pinjam (hari)</label>
+    <input name="loan_days" type="number" min="1" value="{{ loan_days }}">
+    <label>Denda per hari keterlambatan (Rp)</label>
+    <input name="fine_per_day" type="number" min="0" value="{{ fine_per_day }}">
+    <label>Maksimal buku dipinjam atau diajukan sekaligus</label>
+    <input name="max_loans" type="number" min="1" value="{{ max_loans }}">
+    <p style="margin-top:18px"><button class="btn">Simpan</button></p>
+  </form>
+</div>
+{% endblock %}

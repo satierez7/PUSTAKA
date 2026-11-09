@@ -1,0 +1,20 @@
+{% extends "auth.html" %}
+{% block title %}Daftar{% endblock %}
+{% block toplink %}<a href="{{ url_for('login') }}">Masuk</a>{% endblock %}
+{% block form %}
+<h1>Daftar Anggota</h1>
+<p class="sub">Gratis, langsung bisa mengajukan peminjaman</p>
+<form method="post">
+  <label>Nama lengkap</label>
+  <input name="name" value="{{ request.form.get('name', '') }}" required autofocus>
+  <div class="row">
+    <div><label>Email</label><input type="email" name="email" value="{{ request.form.get('email', '') }}" required></div>
+    <div><label>No. HP</label><input name="phone" value="{{ request.form.get('phone', '') }}"></div>
+  </div>
+  <div class="row">
+    <div><label>Kata sandi</label><input type="password" name="password" required autocomplete="new-password"></div>
+    <div><label>Ulangi kata sandi</label><input type="password" name="confirm_password" required autocomplete="new-password"></div>
+  </div>
+  <button class="btn">Daftar Sekarang</button>
+</form>
+{% endblock %}

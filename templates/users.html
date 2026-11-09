@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% from "macros.html" import chip %}
+{% block title %}{{ 'Anggota' if kind == 'anggota' else 'Petugas' }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ 'Anggota' if kind == 'anggota' else 'Petugas' }}</h1>
+    <p class="sub">{{ 'Data anggota perpustakaan' if kind == 'anggota' else 'Akun admin dan petugas (khusus admin)' }}</p>
+  </div>
+  <a class="btn" href="{{ url_for('member_new') if kind == 'anggota' else url_for('staff_new') }}">+ Tambah {{ 'Anggota' if kind == 'anggota' else 'Petugas' }}</a>
+</div>
+<div class="card">
+  {% if kind == 'anggota' %}
+  <form class="filters" method="get">
+    <div><label>Cari nama, email, kode, HP</label><input name="q" value="{{ q }}"></div>
+    <div><label>Status</label>
+      <select name="status">
+        <option value="">Semua</option>
+        <option value="aktif" {{ 'selected' if st == 'aktif' }}>Aktif</option>
+        <option value="nonaktif" {{ 'selected' if st == 'nonaktif' }}>Nonaktif</option>
+      </select></div>
+    <div class="auto"><button class="btn">Cari</button></div>
+  </form>
+  {% endif %}
+  <div class="table-wrap">
+  <table>
+    {% if kind == 'anggota' %}
+    <tr><th>Kode</th><th>Nama</th><th>Kontak</th><th>Dipinjam</th><th>Status</th><th></th></tr>
+    {% for u in rows %}
+    <tr>
+      <td>{{ u.member_code }}</td>
+      <td><strong>{{ u.name }}</strong></td>
+      <td>{{ u.email }}<br><span class="muted small">{{ u.phone or '-' }}</span></td>
+      <td>{{ u.borrowed }}</td>
+      <td>{{ chip(u.status, 'green' if u.status == 'aktif' else 'red') }}</td>
+      <td class="right"><a class="btn ghost sm" href="{{ url_for('member_edit', uid=u.id) }}">Ubah</a></td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="muted">Belum ada anggota.</td></tr>{% endfor %}
+    {% else %}
+    <tr><th>Nama</th><th>Email</th><th>Peran</th><th>Status</th><th></th></tr>
+    {% for u in rows %}
+    <tr>
+      <td><strong>{{ u.name }}</strong>{% if u.id == me.id %} <span class="muted small">(kamu)</span>{% endif %}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ chip(u.role, 'blue' if u.role == 'admin' else 'brown') }}</td>
+      <td>{{ chip(u.status, 'green' if u.status == 'aktif' else 'red') }}</td>
+      <td class="right"><a class="btn ghost sm" href="{{ url_for('staff_edit', uid=u.id) }}">Ubah</a></td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+  </table>
+  </div>
+</div>
+{% endblock %}
